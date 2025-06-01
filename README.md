@@ -1,4 +1,4 @@
-# License Plate Extraction with YOLOv10 and PaddleOCR & Save Data to SQL Database
+# ANPR SYSTEM using Yolov8 and paddle_ocr 
 
 ## How to run:
 
