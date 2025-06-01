@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch with Me - Detect with Me</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f4f4f9, #e0e0f5);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background: #121212;
+            color: #ffffff;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #34495e;
+            font-size: 2em;
+            margin-top: 0;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 20px auto;
+            color: #555;
+        }
+        .button-container {
+            margin-top: 30px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .dark-mode button {
+            background-color: #444;
+            color: #fff;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+        }
+        .modal-content img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .close-modal:hover {
+            background: #ff1a1a;
+        }
+
+        /* Dark Mode Toggle Slider */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3498db;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .social-icons a {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+
+        }
+        .social-icons a:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+        .social-icons a img {
+            width: 20px;
+            height: 20px;
+        }
+        
+        footer a {
+            margin: 0 10px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .dark-mode footer a {
+            color: #fff;
+        }
+
+        /* Styled File Input */
+        .file-input-container {
+            margin: 20px auto;
+            position: relative;
+            width: 200px;
+        }
+
+        .file-input {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            background-color: #2ecc71; /* Green color */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px; /* Fully rounded borders */
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .file-input-label:hover {
+            background-color: #27ae60; /* Darker green on hover */
+        }
+
+        .file-input-label:active {
+            transform: translateY(1px);
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle Slider -->
+    <div class="dark-mode-toggle">
+        <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <h1>Welcome to DETECT WITH ME</h1>
+    <h2>🔍 Detect your License</h2>
+    <p>
+        Welcome to our cutting-edge detection platform, designed to provide seamless and accurate real-time detection solutions. 
+        Whether you're looking to detect objects in live streams, images, or videos, our advanced technology ensures precision 
+        and reliability. Join us in revolutionizing the way you interact with visual data, and experience the future of detection 
+        today.
+    </p>
+    <div class="button-container">
+        <button onclick="startLiveDetection()">📷 Detect Live</button>
+        <button onclick="stopLiveDetection()">⛔ Stop Detection</button>
+    </div>
+
+    <!-- Modal for Live Camera -->
+    <div class="modal" id="cameraModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeCameraModal()">×</button>
+            <h3>Live Camera Feed</h3>
+            <img id="liveFeed" alt="Live Feed">
+        </div>
+    </div>
+
+    <!-- Image Upload Form -->
+    <form id="imageUploadForm" enctype="multipart/form-data">
+        <h2>Upload an Image for Detection</h2>
+        <div class="file-input-container">
+            <input type="file" id="imageUpload" class="file-input" name="image" accept="image/*" required>
+            <label for="imageUpload" class="file-input-label">Choose Image</label>
+            <div id="imageFileName" class="file-name"></div>
+        </div>
+        <button type="submit">Detect License Plate</button>
+    </form>
+
+    
+
+    <!-- Results Section -->
+    <div id="results">
+        <h3>Detection Results</h3>
+        <ul id="resultsList"></ul>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="contact-info">
+            <p>Email: umairkhan.jk1998@gmail.com</p>
+            <p>Contact: 0313 9562477</p>
+        </div>
+        <p>Follow us:</p>
+        <div class="social-icons">
+            <a href="https://twitter.com" target="_blank">
+                <img src="https://cdn-icons-png.flaticon.com/512/124/124021.png" alt="Twitter">
+            </a>
+            <a href="https://github.com" target="_blank">
+                <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub">
+            </a>
+            <a href="https://linkedin.com" target="_blank">
+                <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Start Live Detection
+        function startLiveDetection() {
+            const modal = document.getElementById('cameraModal');
+            const liveFeed = document.getElementById('liveFeed');
+
+            // Set the src to the live_detect route
+            liveFeed.src = "{{ url_for('live_detect') }}";
+            modal.style.display = 'flex';
+        }
+
+        // Stop Live Detection
+        function stopLiveDetection() {
+            const modal = document.getElementById('cameraModal');
+            const liveFeed = document.getElementById('liveFeed');
+
+            // Clear the src to stop the live feed
+            liveFeed.src = "";
+            modal.style.display = 'none';
+        }
+
+        // Close Camera Modal
+        function closeCameraModal() {
+            stopLiveDetection();
+        }
+
+        // Handle Image Upload Form Submission
+        document.getElementById('imageUploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = await fetch('/upload_image', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+            displayResults(result.plates);
+        });
+
+
+        // Display Results
+        function displayResults(plates) {
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+            plates.forEach((plate) => {
+                const li = document.createElement('li');
+                li.textContent = `Plate: ${plate.plate}, Status: ${plate.status}`;
+                resultsList.appendChild(li);
+            });
+        }
+
+        // Display the selected file name
+        document.getElementById('imageUpload').addEventListener('change', function (e) {
+            const fileName = e.target.files[0].name;
+            document.getElementById('imageFileName').textContent = `Selected file: ${fileName}`;
+        });
+
+        document.getElementById('videoUpload').addEventListener('change', function (e) {
+            const fileName = e.target.files[0].name;
+            document.getElementById('videoFileName').textContent = `Selected file: ${fileName}`;
+        });
+    </script>
+</body>
+</html>
