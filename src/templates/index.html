@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Plate Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+   <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+            --light-bg: #f8fafc;
+            --light-card: #ffffff;
+            --text-dark: #0f172a;
+            --text-light: #f1f5f9;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        body.dark {
+            background: var(--dark-bg);
+            color: var(--text-light);
+        }
+
+        /* Header */
+        .header {
+            background: var(--light-card);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .dark .header {
+            background: var(--dark-card);
+            border-bottom: 1px solid #334155;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .logo-icon {
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+        }
+
+        .dark .theme-toggle:hover {
+            background: #334155;
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: var(--light-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .dark .card {
+            background: var(--dark-card);
+            border: 1px solid #334155;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .card-icon.live {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        }
+
+        .card-icon.upload {
+            background: linear-gradient(135deg, var(--secondary-color), var(--secondary-hover));
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .dark .card-title {
+            color: var(--text-light);
+        }
+
+        .card-description {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1rem;
+            justify-content: center;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* File Upload */
+        .file-upload {
+            position: relative;
+            border: 2px dashed var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .file-upload input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-hint {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .file-selected {
+            border-color: var(--secondary-color);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .file-name {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 0.5rem;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--light-card);
+            border-radius: 1rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .dark .modal-content {
+            background: var(--dark-card);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .modal-close:hover {
+            background: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .live-feed {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border-radius: 0.5rem;
+        }
+
+        /* Results */
+        .results {
+            background: var(--light-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+
+        .dark .results {
+            background: var(--dark-card);
+            border: 1px solid #334155;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-color), #f97316);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .results-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .results-list {
+            list-style: none;
+        }
+
+        .result-item {
+            background: rgba(99, 102, 241, 0.05);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--light-card);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .dark .footer {
+            background: var(--dark-card);
+            border-color: #334155;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .contact-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info p {
+            margin: 0.5rem 0;
+            color: var(--text-muted);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+            }
+
+            .main {
+                padding: 2rem 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            display: inline-block;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-active {
+            background: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-inactive {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🔍</div>
+                <span>LicenseDetect</span>
+            </div>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>License Plate Detection</h1>
+            <p>Advanced AI-powered license plate recognition system with real-time detection capabilities and high accuracy image processing.</p>
+        </section>
+
+        <!-- Cards Grid -->
+        <section class="cards-grid">
+            <!-- Live Detection Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon live">📹</div>
+                    <h3 class="card-title">Live Detection</h3>
+                </div>
+                <p class="card-description">
+                    Real-time license plate detection using your camera. Start live streaming and get instant results as plates are detected.
+                </p>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="startLiveDetection()">
+                        📷 Start Live Detection
+                    </button>
+                    <button class="btn btn-danger" onclick="stopLiveDetection()">
+                        ⏹️ Stop Detection
+                    </button>
+                </div>
+            </div>
+
+            <!-- Image Upload Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon upload">📁</div>
+                    <h3 class="card-title">Image Upload</h3>
+                </div>
+                <p class="card-description">
+                    Upload an image to detect license plates. Supports JPG, PNG, and other common image formats.
+                </p>
+                <form id="imageUploadForm" enctype="multipart/form-data">
+                    <div class="file-upload" id="fileUpload">
+                        <input type="file" id="imageUpload" name="image" accept="image/*" required>
+                        <div class="file-upload-icon">📷</div>
+                        <div class="file-upload-text">Click to select image</div>
+                        <div class="file-upload-hint">PNG, JPG up to 10MB</div>
+                        <div id="fileName" class="file-name" style="display: none;"></div>
+                    </div>
+                    <div class="action-buttons" style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-secondary">
+                            🔍 Detect License Plate
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Report Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <h3 class="card-title">Detection Report</h3>
+                </div>
+                <p class="card-description">
+                    View and download all detected license plates in Excel format.
+                </p>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="viewReport()">
+                        👁️ View Report
+                    </button>
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results" id="results" style="display: none;">
+            <div class="results-header">
+                <div class="results-icon">📊</div>
+                <h3 class="results-title">Detection Results</h3>
+            </div>
+            <ul class="results-list" id="resultsList"></ul>
+        </section>
+    </main>
+
+    <!-- Live Detection Modal -->
+    <div class="modal" id="cameraModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <span class="status-indicator status-active"></span>
+                    Live Camera Feed
+                </h3>
+                <button class="modal-close" onclick="closeCameraModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <img id="liveFeed" class="live-feed" alt="Live Camera Feed">
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <!-- Report Modal -->
+<div class="modal" id="reportModal">
+    <div class="modal-content" style="max-width: 90%; width: 1000px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Detection Report</h3>
+            <button class="modal-close" onclick="closeReportModal()">×</button>
+        </div>
+        <div class="modal-body" style="overflow: auto; max-height: 80vh; padding: 2rem;">
+            <div id="reportContent"></div>
+        </div>
+        <div class="report-actions">
+            <button class="btn btn-outline" onclick="closeReportModal()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="contact-info">
+                <p><strong>Contact Information</strong></p>
+                <p>📧 umairkhan.jk1998@gmail.com</p>
+                <p>📱 0313 9562477</p>
+            </div>
+            <div class="social-links">
+                <a href="https://twitter.com" target="_blank" class="social-link">🐦</a>
+                <a href="https://github.com" target="_blank" class="social-link">🐱</a>
+                <a href="https://linkedin.com" target="_blank" class="social-link">💼</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            themeToggle.textContent = body.classList.contains('dark') ? '☀️' : '🌙';
+        });
+
+        // File Upload Handling
+        const fileUpload = document.getElementById('imageUpload');
+        const fileUploadContainer = document.getElementById('fileUpload');
+        const fileName = document.getElementById('fileName');
+
+        fileUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                fileUploadContainer.classList.add('file-selected');
+                fileName.textContent = `Selected: ${file.name}`;
+                fileName.style.display = 'block';
+            } else {
+                fileUploadContainer.classList.remove('file-selected');
+                fileName.style.display = 'none';
+            }
+        });
+
+        // Live Detection Functions
+        let isLiveDetecting = false;
+
+        function startLiveDetection() {
+            if (isLiveDetecting) return;
+            
+            const modal = document.getElementById('cameraModal');
+            const liveFeed = document.getElementById('liveFeed');
+            
+            liveFeed.src = "/live_detect";
+            modal.style.display = 'flex';
+            isLiveDetecting = true;
+        }
+
+        function stopLiveDetection() {
+            const modal = document.getElementById('cameraModal');
+            const liveFeed = document.getElementById('liveFeed');
+            
+            liveFeed.src = "";
+            modal.style.display = 'none';
+            isLiveDetecting = false;
+        }
+
+        function closeCameraModal() {
+            stopLiveDetection();
+        }
+
+        // Form Submission
+        document.getElementById('imageUploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+            submitBtn.disabled = true;
+            
+            try {
+                const formData = new FormData(e.target);
+                const response = await fetch('/upload_image', {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                const result = await response.json();
+                displayResults(result.plates || []);
+            } catch (error) {
+                console.error('Error:', error);
+                displayResults([]);
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Display Results
+        function displayResults(plates) {
+            const resultsSection = document.getElementById('results');
+            const resultsList = document.getElementById('resultsList');
+            
+            resultsList.innerHTML = '';
+            
+            if (plates.length === 0) {
+                resultsList.innerHTML = '<li class="result-item">No license plates detected in the image.</li>';
+            } else {
+                plates.forEach((plate, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'result-item';
+                    li.innerHTML = `
+                        <strong>Plate ${index + 1}:</strong> ${plate.plate || 'Unknown'} 
+                        <span style="float: right; color: ${plate.status === 'Paid' ? 'var(--secondary-color)' : 'var(--danger-color)'};">
+                            ${plate.status || 'Unknown'}
+                        </span>
+                    `;
+                    resultsList.appendChild(li);
+                });
+            }
+            
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Report Functions
+async function viewReport() {
+    const modal = document.getElementById('reportModal');
+    const reportContent = document.getElementById('reportContent');
+    
+    modal.style.display = 'flex';
+    reportContent.innerHTML = '<p style="text-align: center; padding: 2rem;">Loading report...</p>';
+    
+    try {
+        const response = await fetch('/view_report');
+        const result = await response.json();
+        
+        if (result.success) {
+            if (result.data.length > 0) {
+                let html = `
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>License Plate</th>
+                                <th>Status</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                result.data.forEach(row => {
+                    html += `
+                        <tr>
+                            <td>${row['License Plate'] || 'N/A'}</td>
+                            <td class="status-${(row['Status'] || '').toLowerCase()}">${row['Status'] || 'N/A'}</td>
+                            <td>${row['Timestamp'] || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                        </tbody>
+                    </table>
+                    <div class="report-summary">
+                        Total records: ${result.data.length}
+                    </div>
+                `;
+                
+                reportContent.innerHTML = html;
+            } else {
+                reportContent.innerHTML = '<div class="no-data">No detection records found</div>';
+            }
+        } else {
+            reportContent.innerHTML = `<div class="error">Error: ${result.error || 'Unknown error'}</div>`;
+        }
+    } catch (error) {
+        reportContent.innerHTML = `<div class="error">Error loading report: ${error.message}</div>`;
+    }
+}
+
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
+
+        // Close modals on outside click
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('cameraModal')) {
+                closeCameraModal();
+            }
+            if (e.target === document.getElementById('reportModal')) {
+                closeReportModal();
+            }
+        });
+    </script>
+</body>
+</html>
